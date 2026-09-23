@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Silk Bored — certified Bengaluru traffic excuses</title>
+<meta name="description" content="Late again? Pick your junction, pick who's waiting, and get a certified excuse from the Bureau of Bumper-to-Bumper Affairs.">
+<meta property="og:title" content="Silk Bored — certified Bengaluru traffic excuses">
+<meta property="og:description" content="A tiny jammed Bengaluru junction, an excuse generator, and an entirely unofficial delay certificate.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#F4F4F0">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect x='6' y='16' width='52' height='32' rx='6' fill='%230b6b3a'/><rect x='10' y='20' width='44' height='24' rx='3' fill='none' stroke='%23fff' stroke-width='2'/><text x='32' y='38' font-size='14' font-family='Arial' font-weight='900' fill='%23fff' text-anchor='middle'>JAM</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+<style>
+:root{
+  --sky:#f0dccf; --ink:#2a2540; --mute:#6f6886; --paper:#fff8f0; --paper2:#f1eafc;
+  --auto:#f7d25e; --green:#3a936a; --mint:#8fd6b3; --pink:#f4a9c0; --lav:#b7a6f5; --brake:#ee6a7a; --wa:#dff7e8; --wa-bg:#f4eefc;
+  --shadow:6px 6px 0 var(--ink);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--sky);color:var(--ink);font-family:'Space Grotesk',system-ui,sans-serif;overflow:hidden;-webkit-font-smoothing:antialiased}
+body.night{--sky:#2a2b5c}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+svg.i{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#c{position:fixed;inset:0;width:100%;height:100%;display:block;outline:none}
+#honks{position:fixed;inset:0;pointer-events:none;z-index:2;overflow:hidden}
+.honk{position:absolute;transform:translate(-50%,-100%);font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--ink);background:#fff;border:2px solid var(--ink);border-radius:10px;padding:2px 8px;white-space:nowrap;animation:honk 1.35s cubic-bezier(.2,.9,.3,1) forwards;box-shadow:2px 2px 0 var(--ink)}
+.honk::after{content:'';position:absolute;left:50%;bottom:-8px;margin-left:-5px;border:5px solid transparent;border-top-color:var(--ink)}
+.honk.moo{background:#fff4e0}
+@keyframes honk{0%{opacity:0;transform:translate(-50%,-70%) scale(.5) rotate(-6deg)}14%{opacity:1;transform:translate(-50%,-100%) scale(1.12) rotate(3deg)}24%{transform:translate(-50%,-100%) scale(1) rotate(0)}100%{opacity:0;transform:translate(-50%,-190%)}}
+
+.ui{position:fixed;z-index:5;transition:opacity .4s, transform .5s cubic-bezier(.2,.9,.3,1)}
+body.boot .ui{opacity:0}
+body.boot .desk{transform:translateX(-30px)}
+body.boot .brand{transform:translateY(-20px)}
+
+/* brand */
+.brand{top:20px;right:24px;text-align:right}
+.brand h1{font-family:'Space Grotesk',sans-serif;font-weight:400;font-size:clamp(34px,4.4vw,62px);line-height:.92;color:#6f5bd6;filter:drop-shadow(3px 3px 0 #fff8f0)}
+body.night .brand h1{color:#ffe07a;filter:drop-shadow(3px 3px 0 #2f2a45)}
+.brand p{font-size:14px;font-weight:700;color:var(--ink);margin-top:16px;text-shadow:0 1px 8px #fff8f0}
+body.night .brand p{color:#d9d2f0}
+.pills{margin-top:10px;display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
+.pill{display:inline-flex;gap:8px;align-items:center;padding:6px 12px;border-radius:999px;background:var(--paper);border:2px solid var(--ink);font:700 12.5px 'JetBrains Mono',monospace;box-shadow:2px 2px 0 var(--ink)}
+.pill i{width:9px;height:9px;border-radius:50%;background:var(--brake);animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.25}}
+
+/* excuse desk */
+.desk{top:20px;left:20px;width:400px;max-height:calc(100vh - 40px);display:flex;flex-direction:column;background:var(--paper);border:2.5px solid var(--ink);border-radius:24px;box-shadow:var(--shadow);overflow:hidden}
+.desk-head{padding:16px 20px 12px;border-bottom:2px dashed #2f2a4530;background:linear-gradient(180deg,#f6f0ff,var(--paper));display:flex;align-items:center;gap:12px}
+.badge{width:44px;height:44px;border-radius:12px;background:var(--mint);color:var(--ink);display:grid;place-items:center;border:2px solid var(--ink);flex:none}
+.badge svg{width:24px;height:24px}
+.desk-head h2{font-family:'Space Grotesk',sans-serif;font-weight:400;font-size:17px;line-height:1.1}
+.desk-head p{font-size:12px;color:var(--mute);font-weight:600;margin-top:2px}
+.handle{display:none}
+.desk-body{overflow:auto;padding:4px 20px 18px;scrollbar-width:thin}
+.q{margin:14px 0 8px;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);display:flex;justify-content:space-between;align-items:center}
+.q em{font-style:normal;text-transform:none;letter-spacing:0;font-weight:700;color:var(--ink);font-size:12px}
+.signs{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 8px;scrollbar-width:thin;scroll-snap-type:x mandatory}
+.signs button{scroll-snap-align:start;flex:none;padding:8px 12px;border-radius:8px;background:#fff;border:2px solid var(--ink);font:800 12.5px 'Space Grotesk',sans-serif;white-space:nowrap;transition:transform .12s,background .15s}
+.signs button:hover{transform:translateY(-2px)}
+.signs button[aria-pressed=true]{background:var(--green);color:#fff;box-shadow:inset 0 0 0 2px #fff,2px 2px 0 var(--ink)}
+.late{display:flex;align-items:baseline;gap:8px}
+.late b{font:700 38px/1 'JetBrains Mono',monospace;letter-spacing:-1px}
+.late small{font:700 15px 'JetBrains Mono',monospace}
+.late span{margin-left:auto;font-weight:800;color:var(--brake);font-size:15px}
+.slider{position:relative;margin-top:10px;height:34px}
+.slider input{position:absolute;inset:0;width:100%;margin:0;-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer}
+.slider .track{position:absolute;left:0;right:0;top:12px;height:10px;border-radius:999px;border:2px solid var(--ink);background:linear-gradient(90deg,#8fe0b0,#ffe07a 45%,#ffb08a 70%,#ff8a9a)}
+.slider input::-webkit-slider-thumb{-webkit-appearance:none;width:44px;height:34px;border:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 34'%3E%3Crect x='3' y='9' width='36' height='15' rx='5' fill='%23ffe07a' stroke='%232f2a45' stroke-width='2.5'/%3E%3Cpath d='M9 9 L13 3 H30 L35 9' fill='%231d1b16'/%3E%3Ccircle cx='12' cy='26' r='4.5' fill='%231d1b16'/%3E%3Ccircle cx='31' cy='26' r='4.5' fill='%231d1b16'/%3E%3Crect x='36' y='13' width='4' height='4' rx='1' fill='%23fff6c9'/%3E%3C/svg%3E") center/contain no-repeat;position:relative;z-index:2}
+.slider input::-moz-range-thumb{width:44px;height:34px;border:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 34'%3E%3Crect x='3' y='9' width='36' height='15' rx='5' fill='%23ffe07a' stroke='%232f2a45' stroke-width='2.5'/%3E%3Cpath d='M9 9 L13 3 H30 L35 9' fill='%231d1b16'/%3E%3Ccircle cx='12' cy='26' r='4.5' fill='%231d1b16'/%3E%3Ccircle cx='31' cy='26' r='4.5' fill='%231d1b16'/%3E%3C/svg%3E") center/contain no-repeat}
+.ticks{display:flex;justify-content:space-between;margin-top:2px;font:700 10px 'JetBrains Mono',monospace;color:var(--mute)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;border-radius:10px;border:2px solid var(--ink);font-size:13px;font-weight:700;background:#fff;transition:transform .12s,background .15s}
+.chips button svg{width:15px;height:15px}
+.chips button:hover{transform:translateY(-1px)}
+.chips button[aria-pressed=true]{background:var(--auto);box-shadow:2px 2px 0 var(--ink)}
+#tone button[aria-pressed=true]{background:var(--pink)}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.fields input{width:100%;padding:10px 12px;border-radius:12px;border:2px solid var(--ink);background:#fff;font:600 13px 'Space Grotesk',sans-serif;outline:none}
+.fields input:focus{box-shadow:3px 3px 0 var(--lav)}
+.acts{display:grid;grid-template-columns:1.1fr 1fr;gap:8px;margin-top:14px}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:13px 10px;border-radius:14px;border:2.5px solid var(--ink);font-weight:800;font-size:14px;background:#fff;box-shadow:3px 3px 0 var(--ink);transition:transform .08s,box-shadow .08s}
+.btn:active{transform:translate(3px,3px);box-shadow:none}
+.btn.main{background:var(--auto)}
+.btn.ai{background:var(--ink);color:var(--paper)}
+.btn[disabled]{opacity:.65;cursor:wait}
+.btn kbd{font:700 10px 'JetBrains Mono',monospace;padding:1px 5px;border-radius:5px;border:1.5px solid currentColor;opacity:.6}
+#ts{margin-top:8px}
+.err{margin-top:8px;font-size:13px;font-weight:700;color:var(--brake);min-height:0}
+.err:empty{display:none}
+
+/* whatsapp-ish chat */
+.chat{margin-top:14px;border:2.5px solid var(--ink);border-radius:18px;overflow:hidden;display:none;background:var(--wa-bg)}
+.chat.show{display:block;animation:rise .35s cubic-bezier(.2,.9,.3,1)}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}}
+.chat-head{display:flex;align-items:center;gap:10px;padding:9px 12px;background:#5fa88e;color:#fff}
+.avatar{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:#ffcc00;color:#1d1b16;font-weight:800;font-size:14px;border:2px solid #fff}
+.chat-head b{font-size:14px;display:block;line-height:1.1}
+.chat-head small{font-size:11.5px;opacity:.85}
+.chat-body{padding:12px;display:flex;flex-direction:column;gap:6px;max-height:280px;overflow:auto;background-image:radial-gradient(#8f7fe81c 1px,transparent 1px);background-size:14px 14px}
+.msg{max-width:88%;padding:8px 10px 6px;border-radius:12px;font-size:14px;line-height:1.45;white-space:pre-wrap;box-shadow:0 1px 0 #0002;animation:pop .28s cubic-bezier(.2,1.4,.4,1)}
+@keyframes pop{from{opacity:0;transform:scale(.85)}}
+.msg.me{align-self:flex-end;background:var(--wa);border-top-right-radius:4px}
+.msg.them{align-self:flex-start;background:#fff;border-top-left-radius:4px}
+.msg .meta{display:flex;justify-content:flex-end;gap:4px;align-items:center;font-size:10.5px;color:#667;margin-top:2px}
+.tk{font-weight:800;letter-spacing:-3px;color:#8a94a0;transition:color .3s}
+.tk.read{color:#34b7f1}
+.typing{align-self:flex-start;background:#fff;border-radius:12px;padding:10px 12px;display:flex;gap:4px}
+.typing i{width:6px;height:6px;border-radius:50%;background:#999;animation:blink 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes blink{50%{opacity:.25;transform:translateY(-2px)}}
+.row{display:flex;gap:6px;padding:10px;background:var(--paper2);border-top:2px solid var(--ink)}
+.row button,.row a{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:9px;border-radius:12px;border:2px solid var(--ink);font-weight:800;font-size:13px;background:#fff;text-decoration:none;color:inherit}
+.row button svg,.row a svg{width:15px;height:15px}
+.foot{margin-top:14px;font-size:11px;color:var(--mute);line-height:1.5}
+.foot a,.foot button{color:inherit;text-decoration:underline;font-size:inherit}
+.me-intro{--me-accent:#f7d25e;--me-paper:#fff8f0;--me-accent-ink:#2f2a45;--me-ink:#2f2a45;--me-mute:#7a7390;--me-soft:#f6f0ff;--me-display:400 40px/0.95 'Space Grotesk',sans-serif;--me-title:#6f5bd6;--me-font:'Space Grotesk',sans-serif;--me-border:2.5px solid #2f2a45;--me-shadow:8px 8px 0 #2f2a45;--me-btn-border:2.5px solid #2f2a45;--me-btn-shadow:3px 3px 0 #2f2a45}
+.me-intro .me-steps li{border:2px solid #2f2a45}.me-intro .me-steps li:nth-child(2){background:#fff4d6}.me-intro .me-steps li:nth-child(3){background:#e6f8ef}
+
+/* toolbar */
+.tools{bottom:20px;right:20px;display:flex;gap:8px;align-items:center}
+.seg{display:flex;padding:3px;border-radius:14px;background:var(--paper);border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink)}
+.seg button{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border-radius:10px;font-weight:800;font-size:12.5px}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--paper)}
+.tool{width:42px;height:42px;border-radius:14px;background:var(--paper);border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);display:grid;place-items:center}
+.tool.me-ava{border-radius:50%;overflow:visible}
+.tool.me-ava img{border-radius:50%}
+.tool.me-music.on{background:var(--lav)}
+.tool[aria-pressed=true]{background:var(--auto)}
+.tool:active,.seg:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+
+/* modals */
+.modal{position:fixed;inset:0;z-index:20;display:grid;place-items:center;background:#2f2a4566;backdrop-filter:blur(5px);opacity:0;pointer-events:none;transition:.25s;padding:16px}
+.modal.open{opacity:1;pointer-events:auto}
+.sheet{width:min(780px,100%);max-height:92vh;overflow:auto;background:var(--paper);border:2.5px solid var(--ink);border-radius:22px;box-shadow:8px 8px 0 var(--ink);padding:20px;transform:translateY(16px) scale(.98);transition:transform .35s cubic-bezier(.2,.9,.3,1)}
+.modal.open .sheet{transform:none}
+.sheet.slam{animation:slam .38s}
+@keyframes slam{0%{transform:none}25%{transform:translate(-5px,4px) rotate(-.4deg)}50%{transform:translate(4px,-3px) rotate(.3deg)}75%{transform:translate(-2px,1px)}}
+.sheet h3{font-family:'Space Grotesk',sans-serif;font-weight:400;font-size:22px}
+.sheet p,.sheet li{font-size:15px;line-height:1.55}
+.sheet ul{padding-left:18px;margin-top:8px}
+.sheet canvas{width:100%;height:auto;border-radius:10px;margin-top:12px;border:2px solid var(--ink);display:block}
+.sheet .row{margin-top:12px;padding:0;background:none;border:0}
+.close{float:right;width:34px;height:34px;border-radius:10px;border:2px solid var(--ink);font-size:20px;font-weight:800;line-height:1}
+#toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);z-index:40;padding:11px 16px;border-radius:12px;background:var(--ink);color:var(--paper);font-weight:800;opacity:0;transition:.3s;pointer-events:none;border:2px solid var(--paper)}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+#loader{position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:var(--sky);transition:opacity .6s}
+#loader.done{opacity:0;pointer-events:none}
+#loader div{text-align:center;font-family:'Space Grotesk',sans-serif;font-size:22px}
+#loader small{display:block;font:600 13px 'Space Grotesk';color:var(--mute);margin-top:6px}
+body.night #loader div{color:#fffaf5}body.night #loader small{color:#d9d2f0}
+.bar{width:220px;height:12px;border:2px solid var(--ink);border-radius:999px;margin:14px auto 0;overflow:hidden;background:#fff}
+.bar i{display:block;height:100%;width:30%;background:repeating-linear-gradient(45deg,#ffe07a 0 10px,#2f2a45 10px 20px);animation:load 1.2s linear infinite}
+@keyframes load{from{transform:translateX(-100%)}to{transform:translateX(350%)}}
+
+@media (max-width:820px){
+  .brand{top:12px;right:14px}.brand h1{font-size:30px}.brand p{display:none}
+  .pills{display:none}
+  .desk{top:auto;bottom:0;left:0;right:0;width:auto;max-height:62vh;border-radius:22px 22px 0 0;box-shadow:none;border-width:2.5px 0 0;transition:max-height .35s}
+  .desk.min{max-height:128px}
+  .handle{display:block;position:absolute;top:6px;left:50%;margin-left:-22px;width:44px;height:5px;border-radius:9px;background:#2f2a4540}
+  .desk-head{cursor:pointer;padding-top:18px}
+  .tools{top:12px;left:12px;bottom:auto;right:auto;flex-wrap:wrap;max-width:60vw}
+  .seg button span{display:none}
+  body.boot .desk{transform:translateY(30px)}
+}
+
+/* ===== Gumroad-style theme ===== */
+:root{
+  --sky:#F4F4F0; --ink:#000; --mute:#555; --paper:#fff; --paper2:#F4F4F0;
+  --auto:#FFC900; --pinkg:#FF90E8; --blue:#90A8ED; --teal:#23A094; --green:#23A094; --mint:#FF90E8; --pink:#FF90E8; --lav:#90A8ED; --brake:#E0457B;
+  --wa:#DDF6EE; --wa-bg:#F4F4F0; --shadow:6px 6px 0 #000;
+}
+body.night{--sky:#1f1d3a}
+body{letter-spacing:-.01em}
+.brand h1{display:inline-block;font-weight:700;font-size:clamp(30px,3.4vw,46px);letter-spacing:-.04em;line-height:1;color:#000;background:var(--pinkg);border:2px solid #000;border-radius:10px;padding:6px 14px 8px;box-shadow:4px 4px 0 #000;filter:none;transform:rotate(2deg)}
+.brand h1 br{display:none}
+body.night .brand h1{color:#000;background:var(--auto);filter:none}
+.brand p{display:inline-block;background:#fff;border:2px solid #000;border-radius:8px;padding:6px 10px;color:#000;text-shadow:none;box-shadow:3px 3px 0 #000;font-size:13px}
+body.night .brand p{color:#000}
+.pill{border-radius:8px;box-shadow:3px 3px 0 #000;background:#fff}
+.desk{border-radius:12px;border-width:2px}
+.desk-head{background:#fff;border-bottom:2px solid #000}
+.badge{background:var(--pinkg);color:#000;border-radius:8px;transform:rotate(-4deg)}
+.desk-head h2{letter-spacing:-.02em}
+.signs button{border-radius:6px;border-width:1.5px}
+.signs button[aria-pressed=true]{background:var(--pinkg);color:#000;box-shadow:2px 2px 0 #000}
+.chips button{border-radius:6px;border-width:1.5px}
+.chips button[aria-pressed=true]{background:var(--auto)}
+#tone button[aria-pressed=true]{background:var(--blue)}
+.slider .track{background:linear-gradient(90deg,#23A094,#FFC900 45%,#FF90E8 72%,#E0457B)}
+.fields input{border-radius:8px;border-width:1.5px}
+.fields input:focus{box-shadow:3px 3px 0 #000}
+.btn{border-radius:8px;border-width:2px;transition:transform .12s,box-shadow .12s}
+.btn:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 #000}
+.btn.main{background:var(--pinkg)}
+.btn.ai{background:#000;color:#fff}
+.chat{border-radius:10px;border-width:2px}
+.chat-head{background:var(--teal)}
+.avatar{border-color:#000}
+.msg{border:1.5px solid #000;box-shadow:none}
+.row button,.row a{border-radius:8px;border-width:1.5px}
+.row button:hover,.row a:hover{background:var(--auto)}
+.seg,.tool{border-radius:8px;box-shadow:3px 3px 0 #000;background:#fff}
+.seg button{border-radius:6px}
+.seg button[aria-pressed=true]{background:#000;color:#fff}
+.tool[aria-pressed=true]{background:var(--auto)}
+.tool.me-music.on{background:var(--pinkg)}
+.sheet{border-radius:12px;border-width:2px}
+.close{border-radius:8px}
+.honk{font-weight:700;border-radius:6px;border-width:1.5px}
+.honk.moo{background:var(--auto)}
+#toast{border-radius:8px;box-shadow:4px 4px 0 var(--pinkg);border:0}
+#loader div{font-weight:700;letter-spacing:-.04em;font-size:28px}
+.bar i{background:repeating-linear-gradient(45deg,#FF90E8 0 10px,#000 10px 20px)}
+.me-intro .me-go{background:#FF90E8}
+.me-intro .me-steps li:nth-child(1){background:#FFE6FA}.me-intro .me-steps li:nth-child(2){background:#FFF4C2}.me-intro .me-steps li:nth-child(3){background:#E4EBFD}
+@media (max-width:820px){.brand h1{font-size:24px;padding:4px 10px 6px}}
+.desk-head h2,.sheet h3{font-weight:700;letter-spacing:-.03em;font-size:19px}.sheet h3{font-size:24px}
+
+/* ===== colour blocks ===== */
+.brand h1{background:#FFC900}
+body.night .brand h1{background:#FF90E8}
+.brand p{background:#FF90E8}
+.desk-head{background:#FFC900}
+.badge{background:#fff}
+.desk-body{background:#fff}
+.signs button[aria-pressed=true]{background:#23A094;color:#fff}
+.chips button[aria-pressed=true]{background:#FF90E8}
+#tone button[aria-pressed=true]{background:#90A8ED}
+.btn.main{background:#FFC900}
+.btn.ai{background:#FF90E8;color:#000}
+.chat-head{background:#23A094}
+.msg.me{background:#D3F2EA}
+.row{background:#FFF4C2}
+.pill:first-child{background:#90A8ED}
+.pill{background:#fff}
+.seg{background:#fff}
+.seg button[aria-pressed=true]{background:#FF90E8;color:#000}
+.tool{background:#fff}
+.tool[aria-pressed=true]{background:#FFC900}
+.tool.me-music.on{background:#23A094;color:#fff}
+.sheet{background:#fff}
+#toast{background:#FF90E8;color:#000;border:2px solid #000;box-shadow:4px 4px 0 #000}
+</style>
+</head>
+<body class="boot">
+<canvas id="c" tabindex="-1"></canvas>
+<div id="honks"></div>
+
+<header class="ui brand">
+  <h1>Silk Bored</h1>
+  <p>Certified excuses from Bengaluru's finest junctions.</p>
+  <div class="pills">
+    <span class="pill" id="clock">Bengaluru · --:--</span>
+    <span class="pill" title="Speed of the tiny cars in this diorama, not live traffic"><i></i><span id="speed">– km/h</span></span>
+  </div>
+</header>
+
+<section class="ui desk" id="desk" aria-label="The excuse desk">
+  <div class="desk-head" id="deskHead">
+    <span class="handle"></span>
+    <div class="badge"><svg viewBox="0 0 24 24" class="i"><path d="M4 21V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v16l-4-2-4 2-4-2z"/><path d="M8 8h8M8 12h6"/></svg></div>
+    <div><h2>THE EXCUSE DESK</h2><p>Bureau of Bumper-to-Bumper Affairs · unofficial</p></div>
+  </div>
+  <div class="desk-body">
+    <div class="q">Where are you stuck?</div>
+    <div class="signs" id="jn"></div>
+
+    <div class="q">How late? <em id="mWord">Noticeably</em></div>
+    <div class="late"><b id="mVal">35</b><small>min</small></div>
+    <div class="slider"><div class="track"></div><input type="range" id="mins" min="5" max="240" value="35" step="5" aria-label="Minutes late"></div><div class="ticks"><span>5 min</span><span>1 hr</span><span>2 hr</span><span>3 hr</span><span>4 hr</span></div>
+
+    <div class="q">Who's waiting?</div>
+    <div class="chips" id="aud"></div>
+
+    <div class="q">Tone</div>
+    <div class="chips" id="tone"></div>
+
+    <div class="fields">
+      <input id="name" maxlength="40" placeholder="Your name (certificate)" autocomplete="name">
+      <input id="detail" maxlength="80" placeholder="Late for? e.g. standup">
+    </div>
+
+    <div class="acts">
+      <button class="btn main" id="gen"><svg class="i" viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg>Generate <kbd>G</kbd></button>
+      <button class="btn ai" id="ai"><svg class="i" viewBox="0 0 24 24"><path d="M12 3l1.8 4.9L19 9.7l-4.3 3.1L16 18l-4-2.8L8 18l1.3-5.2L5 9.7l5.2-1.8z"/></svg>Bulletproof it</button>
+    </div>
+    <div id="ts"></div>
+    <div class="err" id="err" role="alert"></div>
+
+    <div class="chat" id="chat" aria-live="polite">
+      <div class="chat-head"><div class="avatar" id="chatAv">M</div><div><b id="chatName">Manager</b><small id="chatStatus">online</small></div></div>
+      <div class="chat-body" id="chatBody"></div>
+      <div class="row">
+        <button id="copy"><svg class="i" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>Copy</button>
+        <a id="wa" target="_blank" rel="noopener"><svg class="i" viewBox="0 0 24 24"><path d="M21 12a9 9 0 0 1-13.4 7.8L3 21l1.3-4.4A9 9 0 1 1 21 12z"/></svg>WhatsApp</a>
+        <button id="cert"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="9" r="6"/><path d="M8.5 14 7 22l5-3 5 3-1.5-8"/></svg>Certificate</button>
+      </div>
+    </div>
+    <p class="foot">“Generate” is free and instant. “Bulletproof” asks a small AI model and is rate-limited. The diorama is a toy, not live traffic. Made by <a href="https://github.com/Hiteshldt" target="_blank" rel="noopener">Hitesh Gupta</a>.</p>
+  </div>
+</section>
+
+<div class="ui tools" id="tools">
+  <div class="seg" id="tod" role="group" aria-label="Time of day"></div>
+  <button class="tool" id="rain" title="Monsoon (M)" aria-pressed="false"><svg class="i" viewBox="0 0 24 24"><path d="M7 15a4 4 0 1 1 .6-8A6 6 0 0 1 19 9a3.5 3.5 0 0 1-1 6.9H7z"/><path d="M8 19l-1 2M12 19l-1 2M16 19l-1 2"/></svg></button>
+  <button class="tool" id="snd" title="Honks and traffic noise (S)" aria-pressed="false"><svg class="i" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z"/><path id="sndWave" d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11" opacity=".25"/></svg></button>
+  <button class="tool" id="btnTs" title="Tilt-shift lens (T)" aria-pressed="true"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M3 7h18M3 17h18" opacity=".5"/></svg></button>
+  <button class="tool" id="btnHelp" title="About"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.5v.01"/></svg></button>
+</div>
+
+<div class="modal" id="certModal" role="dialog" aria-modal="true" aria-labelledby="certT">
+  <div class="sheet" id="certSheet">
+    <button class="close" data-close aria-label="Close">×</button>
+    <h3 id="certT">Your delay certificate</h3>
+    <canvas id="certCanvas" width="1400" height="990"></canvas>
+    <div class="row"><button id="dl"><svg class="i" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 21h16"/></svg>Download PNG</button><button id="shareCert"><svg class="i" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>Share</button></div>
+  </div>
+</div>
+
+<div class="modal" id="help" role="dialog" aria-modal="true" aria-labelledby="helpT">
+  <div class="sheet" style="width:min(560px,100%)">
+    <button class="close" data-close aria-label="Close">×</button>
+    <h3 id="helpT">What is this</h3>
+    <p style="margin-top:10px">A tiny diorama of a Bengaluru junction, and an excuse generator for when you're stuck in one. Drag “how late” and watch the traffic give up. Past two hours, a cow takes over.</p>
+    <ul>
+      <li><b>Generate</b> uses hand-written templates. It's free and always works.</li>
+      <li><b>Bulletproof</b> asks a small, cheap AI model for a custom excuse. It's rate-limited so the tool stays free for everyone.</li>
+      <li>The <b>certificate</b> is a joke with no legal value, and it says so on the certificate.</li>
+      <li>The diorama isn't live traffic. The real thing is usually worse.</li>
+    </ul>
+    <p style="margin-top:10px">Keys: <b>G</b> generate · <b>M</b> monsoon · <b>N</b> day/dusk/night · <b>S</b> honks · <b>T</b> tilt-shift · <b>Esc</b> close</p>
+  </div>
+</div>
+<div id="toast"></div>
+<div id="loader"><div>Silk Bored<small>Merging into traffic…</small><div class="bar"><i></i></div></div></div>
+<script type="module" src="./app.js"></script>
+</body>
+</html>
